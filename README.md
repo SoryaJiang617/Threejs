@@ -1,10 +1,30 @@
-# Getting Started with Create React App
+# CBC Three.js Programming Test
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a simple test to verify your familiarity with Three.js and React, it should only take you a couple of hours.
 
-## Available Scripts
+This is a simple art gallery application with a 3D virtual art gallery scene.
 
-In the project directory, you can run:
+## Tasks
+
+1. Rewrite image fetching to use RTK
+2. Display the actual images and their names in the gallery list
+3. Display the images in the 3D art gallery by rendering them in frames on the walls
+4. Add the `adjustable_leg.glb` 3D model as a sculpture on top of the cylinder
+5. Add a button to move the camera to show the sculpture, then slowly rotate the room around so you can see it from all sides
+6. Add code to zoom to a particular image when it's clicked in the list
+7. Spend an hour improving the appearance, animations, and look and feel of the app - show off your skills and flair!
+
+Once you're done:
+
+1. Delete the `node_modules` directory
+2. Create a zip file of the entire directory, including the .git file
+3. Send it back to us
+
+Thanks!
+
+## Application Environment
+
+This application was built using Create React App, so all the usual scripts are available:
 
 ### `npm start`
 
