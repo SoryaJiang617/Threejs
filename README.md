@@ -14,6 +14,30 @@ This is a simple art gallery application with a 3D virtual art gallery scene.
 6. Add code to zoom to a particular image when it's clicked in the list
 7. Spend an hour improving the appearance, animations, and look and feel of the app - show off your skills and flair!
 
+## Implementation Notes
+
+- I used RTK Query to fetch the photo data and handle loading and error states.
+- I built the 3D scene with React Three Fiber and Drei.
+- The images keep their original aspect ratio and are displayed in frames around the wall.
+- The sculpture is loaded with `useGLTF`. I used `Box3` to calculate its size and place it on the cylinder.
+- Clicking an image moves the camera to the related frame.
+- The sculpture button moves the camera to the sculpture and starts a slow orbit.
+- The camera can also move back to the main gallery view.
+- I added lighting, shadows, loading feedback, error handling, and hover and selected styles.
+- Automatic rotation is disabled when the user has enabled `prefers-reduced-motion`.
+
+### Image Source Note
+
+The API still returns the photo data, but the original `via.placeholder.com` image URLs did not work during development. I kept the original URLs in `originalUrl` and `originalThumbnailUrl`, and used Picsum URLs to display the images.
+
+### Controls
+
+- Click an artwork in the list to view it in the 3D gallery.
+- Click **View Sculpture** to focus on the sculpture.
+- Click **Back to Gallery** to return to the main view.
+- Drag inside the 3D view to rotate the camera.
+- Use the mouse wheel to zoom.
+
 Once you're done:
 
 1. Delete the `node_modules` directory
