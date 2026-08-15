@@ -1,7 +1,10 @@
-import { Suspense, useMemo, useRef,useState,useEffect,} from "react";
-import { Canvas,useFrame,useThree, } from "@react-three/fiber";
-import { OrbitControls, useTexture, useGLTF, Html, useProgress,} from "@react-three/drei";
+import { Suspense,useState,useEffect,} from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Html, useProgress,} from "@react-three/drei";
 import * as THREE from "three";
+import Artwork from "./scene/Artwork";
+import Sculpture from "./scene/Sculpture";
+import CameraRig from "./scene/CameraRig";
 
 const ROOM_RADIUS = 10;
 const ARTWORK_WALL_OFFSET = 0.6;
@@ -18,30 +21,7 @@ function SceneLoader() {
     </Html>
   );
 }
-function SingleArtwork({ imageUrl, position, rotation, selected,}) {
-  const [hovered, setHovered] = useState(false);
-  const texture = useTexture(imageUrl);
-  const imageAspect = texture.image.width / texture.image.height;
-  const artworkHeight = 1.6;
-  const artworkWidth = artworkHeight * imageAspect;
-  const frameColor = selected ? "#d4a853" : hovered ? "#8b5e3c" : "#4a2c1d";
-  const frameScale = selected ? 1.08 : hovered ? 1.04 : 1;
-  return (
-    <group position={position} rotation={rotation} scale={frameScale}
-      onPointerOver={(event) => {event.stopPropagation(); setHovered(true);}}
-      onPointerOut={() => {setHovered(false);}}>
-      <mesh position={[0, 0, -0.08]} castShadow>
-        <boxGeometry args={[artworkWidth + 0.25,artworkHeight + 0.25,0.12,]}/>
-        <meshStandardMaterial color={frameColor} roughness={0.55} metalness={0}/>
-      </mesh>
-
-      <mesh position={[0, 0, 0]}>
-        <planeGeometry args={[artworkWidth, artworkHeight]}/>
-        <meshStandardMaterial map={texture} />
-      </mesh>
-    </group>
-  );
-}
+// function SingleArtwork({ imageUrl, position, rotation, selected,}) {
 
 function Room() {
   return (
@@ -67,103 +47,8 @@ function Pedestal() {
   );
 }
 // function Sculpture() {
-//   const { scene } = useGLTF("/adjustable_leg.glb" );
-//   return (
-//     <primitive object={scene} position={[0, 1.5, 0]} scale={[10, 10, 10]} />
-//   );
-// }
-function Sculpture() {
-  const { scene } = useGLTF("/adjustable_leg.glb");
+// function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount,}) {
 
-  const {model,modelScale,modelOffset,} = useMemo(() => {
-    const model = scene.clone(true);
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    const box =new THREE.Box3().setFromObject(model);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-
-    box.getSize(size);
-    box.getCenter(center);
-
-    const targetHeight = 1.5;
-    const modelScale =size.y > 0 ? targetHeight / size.y : 1;
-    const modelOffset = [-center.x,-box.min.y,-center.z,];
-
-    return {model,modelScale,modelOffset,};
-  }, [scene]);
-
-  return (
-    <group position={[0, 4, 0]} scale={modelScale}>
-      <group position={modelOffset}>
-        <primitive object={model} />
-      </group>
-    </group>
-  );
-}
-function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount,}) {
-  const { camera } = useThree();
-  const hasArrived = useRef(false);
-  const sculptureCameraPosition =useMemo(() => new THREE.Vector3(4, 5, 4),[]);//4.75+any num=5
-  const sculptureTarget =useMemo(() => new THREE.Vector3(0, 4.75, 0),[]);//sculpture center =4 + 1.5 / 2= 4.75
-  const artworkAngle = useMemo(() => {
-      if (selectedPhotoIndex < 0 || artworkCount === 0) {
-        return null;
-      }
-      return (
-        (selectedPhotoIndex / artworkCount) * Math.PI * 2
-      );
-    }, [selectedPhotoIndex, artworkCount]);
-  const artworkTarget = useMemo(() => {
-    if (artworkAngle === null) {
-      return null;
-    }
-    return new THREE.Vector3(Math.sin(artworkAngle) * ARTWORK_RADIUS,3,-Math.cos(artworkAngle) * ARTWORK_RADIUS);
-  }, [artworkAngle]);
-
-  const artworkCameraPosition = useMemo(() => {
-    if (artworkAngle === null) {
-      return null;
-    }
-    const cameraRadius = 7;
-    return new THREE.Vector3(Math.sin(artworkAngle) * cameraRadius,3,-Math.cos(artworkAngle) * cameraRadius);
-  }, [artworkAngle]);
-  useEffect(() => {
-    hasArrived.current = false;
-  }, [cameraMode, selectedPhotoIndex]);
-  useFrame((_, delta) => {
-    if (hasArrived.current) return;
-    let cameraDestination = null;
-    let lookAtPosition = null;
-
-    if (cameraMode === "sculpture") {
-      cameraDestination = sculptureCameraPosition;
-      lookAtPosition = sculptureTarget;
-    } else if (cameraMode === "artwork" && artworkCameraPosition !== null && artworkTarget !== null
-    ) {
-      cameraDestination = artworkCameraPosition;
-      lookAtPosition = artworkTarget;
-    } else return;
-
-    const moveSpeed = 2.5;
-    const lerpAmount = 1 - Math.exp(-moveSpeed * delta);
-
-    camera.position.lerp(cameraDestination,lerpAmount );
-    camera.lookAt(lookAtPosition);
-
-    if (camera.position.distanceTo(cameraDestination) < 0.05) {
-      hasArrived.current = true;
-      if (cameraMode === "sculpture") {
-        onArrive();
-      }
-    }
-  });
-  return null;
-}
 const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
   const visiblePhotos = photos.slice(0, 20);
   const selectedPhotoIndex =
@@ -198,7 +83,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
             const z = -Math.cos(angle) * ARTWORK_RADIUS;
 
             return (
-              <SingleArtwork
+              <Artwork
                 key={photo.id}
                 imageUrl={photo.url}
                 position={[x, 3, z]}
@@ -212,7 +97,8 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
           cameraMode={cameraMode} 
           onArrive={() => setIsOrbiting(true)}
           selectedPhotoIndex={selectedPhotoIndex}
-          artworkCount={visiblePhotos.length}/>
+          artworkCount={visiblePhotos.length}
+          artworkRadius={ARTWORK_RADIUS}/>
         <OrbitControls
           enabled={
             cameraMode === "gallery" || (cameraMode === "sculpture" && isOrbiting)
