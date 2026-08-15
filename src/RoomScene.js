@@ -3,6 +3,10 @@ import { Canvas,useFrame,useThree, } from "@react-three/fiber";
 import { OrbitControls, useTexture, useGLTF, Html, useProgress,} from "@react-three/drei";
 import * as THREE from "three";
 
+const ROOM_RADIUS = 10;
+const ARTWORK_WALL_OFFSET = 0.6;
+const ARTWORK_RADIUS = ROOM_RADIUS - ARTWORK_WALL_OFFSET;
+
 function SceneLoader() {
   const progress = useProgress((state) => state.progress);
 
@@ -42,8 +46,8 @@ function SingleArtwork({ imageUrl, position, rotation, selected,}) {
 function Room() {
   return (
     <group>
-      <mesh position={[0, 3, 0]} receiveShadow>
-        <cylinderGeometry args={[10, 10, 6, 64, 1, true]}/>
+      <mesh position={[0, 5, 0]} receiveShadow>
+        <cylinderGeometry args={[10, 10, 10, 64, 1, true]}/>{/* roomWallsGeometry = new THREE.CylinderGeometry(10,10,10,64,1,true); */}
         <meshStandardMaterial color="#d6d3d1" roughness={0.9} side={THREE.BackSide}/>
       </mesh>
 
@@ -56,8 +60,8 @@ function Room() {
 }
 function Pedestal() {
   return (
-    <mesh position={[0, 0.75, 0]} castShadow receiveShadow>
-      <cylinderGeometry args={[1, 1, 1.5, 32]}/>
+    <mesh position={[0, 2, 0]} castShadow receiveShadow>
+      <cylinderGeometry args={[1, 1, 4, 32]}/>{/* THREE.CylinderGeometry(1, 1, 4, 32); */}
       <meshStandardMaterial color="#b8b0a4" roughness={0.45} metalness={0}/>
     </mesh>
   );
@@ -69,9 +73,7 @@ function Pedestal() {
 //   );
 // }
 function Sculpture() {
-  const { scene } = useGLTF(
-    "/adjustable_leg.glb"
-  );
+  const { scene } = useGLTF("/adjustable_leg.glb");
 
   const {model,modelScale,modelOffset,} = useMemo(() => {
     const model = scene.clone(true);
@@ -96,7 +98,7 @@ function Sculpture() {
   }, [scene]);
 
   return (
-    <group position={[0, 1.5, 0]} scale={modelScale}>
+    <group position={[0, 4, 0]} scale={modelScale}>
       <group position={modelOffset}>
         <primitive object={model} />
       </group>
@@ -106,8 +108,8 @@ function Sculpture() {
 function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount,}) {
   const { camera } = useThree();
   const hasArrived = useRef(false);
-  const sculptureCameraPosition =useMemo(() => new THREE.Vector3(4, 2.7, 4),[]);
-  const sculptureTarget =useMemo(() => new THREE.Vector3(0, 2.25, 0),[]);
+  const sculptureCameraPosition =useMemo(() => new THREE.Vector3(4, 5, 4),[]);//4.75+any num=5
+  const sculptureTarget =useMemo(() => new THREE.Vector3(0, 4.75, 0),[]);//sculpture center =4 + 1.5 / 2= 4.75
   const artworkAngle = useMemo(() => {
       if (selectedPhotoIndex < 0 || artworkCount === 0) {
         return null;
@@ -120,8 +122,7 @@ function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount,}) {
     if (artworkAngle === null) {
       return null;
     }
-    const wallRadius = 9.4;
-    return new THREE.Vector3(Math.sin(artworkAngle) * wallRadius,3,-Math.cos(artworkAngle) * wallRadius);
+    return new THREE.Vector3(Math.sin(artworkAngle) * ARTWORK_RADIUS,3,-Math.cos(artworkAngle) * ARTWORK_RADIUS);
   }, [artworkAngle]);
 
   const artworkCameraPosition = useMemo(() => {
@@ -175,7 +176,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
   }, [cameraMode]);
   return (
     <div className="h-full w-full">
-      <Canvas shadows camera={{ position: [0, 3, 0.5] }}>
+      <Canvas shadows camera={{ position: [0, 5, 8] }}>{/* y=5 房间高度 10 的中间附近;z=8在房间 radius 10 里面 */}
         <color attach="background" args={["#171717"]} />
 
         <ambientLight intensity={0.5} />
@@ -193,9 +194,8 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
           <Sculpture />
           {visiblePhotos.map((photo, index) => {
             const angle = (index / visiblePhotos.length) * Math.PI * 2;
-            const radius = 9.4;
-            const x = Math.sin(angle) * radius;
-            const z = -Math.cos(angle) * radius;
+            const x = Math.sin(angle) * ARTWORK_RADIUS;
+            const z = -Math.cos(angle) * ARTWORK_RADIUS;
 
             return (
               <SingleArtwork
@@ -217,7 +217,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
           enabled={
             cameraMode === "gallery" || (cameraMode === "sculpture" && isOrbiting)
           }
-          target={[0, 2.25, 0]}
+          target={cameraMode === "sculpture" ? [0, 4.75, 0] : [0, 3, 0]}// 4.75 = 算出来的 sculpture 中心;3 = 你现在画作的统一中心高度
           autoRotate={cameraMode === "sculpture" && isOrbiting}
           autoRotateSpeed={0.5}
           enableDamping
