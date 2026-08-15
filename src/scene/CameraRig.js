@@ -7,6 +7,10 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
   const hasArrived = useRef(false);
   const sculptureCameraPosition =useMemo(() => new THREE.Vector3(4, 5, 4),[]);//4.75+any num=5
   const sculptureTarget =useMemo(() => new THREE.Vector3(0, 4.75, 0),[]);//sculpture center =4 + 1.5 / 2= 4.75
+
+  const galleryCameraPosition = useMemo(() => new THREE.Vector3(0, 5, 8),[]);
+  const galleryTarget = useMemo(() => new THREE.Vector3(0, 3, 0),[]);
+
   const artworkAngle = useMemo(() => {
       if (selectedPhotoIndex < 0 || artworkCount === 0) {
         return null;
@@ -46,6 +50,9 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
     ) {
       cameraDestination = artworkCameraPosition;
       lookAtPosition = artworkTarget;
+    } else if (cameraMode === "gallery") {
+      cameraDestination = galleryCameraPosition;
+      lookAtPosition = galleryTarget;
     } else return;
 
     const moveSpeed = 2.5;
