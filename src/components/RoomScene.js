@@ -39,7 +39,6 @@ function SceneLoader() {
     </Html>
   );
 }
-// function SingleArtwork({ imageUrl, position, rotation, selected,}) {
 
 function Room() {
   return (
@@ -64,8 +63,6 @@ function Pedestal() {
     </mesh>
   );
 }
-// function Sculpture() {
-// function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount,}) {
 
 const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
   const visiblePhotos = photos.slice(0, 20);
@@ -79,7 +76,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
     const handleChange = () => {
       setPrefersReducedMotion(mediaQuery.matches);
     };
-    handleChange();//页面刚加载时立即检查一次用户设置
+    handleChange();
 
     mediaQuery.addEventListener("change", handleChange);
 
@@ -96,7 +93,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
 
   return (
     <div className="h-full w-full">
-      <Canvas shadows camera={{ position: GALLERY_CAMERA_POSITION, }}>{/* y=5 房间高度 10 的中间附近;z=8在房间 radius 10 里面 */}
+      <Canvas shadows camera={{ position: GALLERY_CAMERA_POSITION, }}>
         <color attach="background" args={["#171717"]} />
 
         <ambientLight intensity={0.5} />
@@ -142,7 +139,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
           enabled={
             cameraMode === "gallery" || (cameraMode === "sculpture" && isOrbiting)
           }
-          target={cameraMode === "sculpture" ? [0, SCULPTURE_CENTER_Y, 0] : [0, ARTWORK_CENTER_Y, 0]}// 4.75 = 算出来的 sculpture 中心;3 = 你现在画作的统一中心高度
+          target={cameraMode === "sculpture" ? [0, SCULPTURE_CENTER_Y, 0] : [0, ARTWORK_CENTER_Y, 0]}
           autoRotate={cameraMode === "sculpture" && isOrbiting && !prefersReducedMotion}
           autoRotateSpeed={0.5}
           enableDamping

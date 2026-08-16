@@ -30,7 +30,3 @@ export const apiSlice = createApi({
 });
 
 export const { useGetPhotosQuery } = apiSlice;
-// 公司原始 Gallery.js
-// → 请求 JSONPlaceholder /photos
-// → JSONPlaceholder 返回 photo 数据
-// → 每条数据包含 url 和 thumbnailUrl

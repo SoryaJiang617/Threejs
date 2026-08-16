@@ -35,9 +35,3 @@ export default function Sculpture() {
     </group>
   );
 }
-// function Sculpture() {
-//   const { scene } = useGLTF("/adjustable_leg.glb" );
-//   return (
-//     <primitive object={scene} position={[0, 1.5, 0]} scale={[10, 10, 10]} />
-//   );
-// }

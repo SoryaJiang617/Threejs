@@ -2,6 +2,7 @@ import {useEffect,useMemo,useRef,} from "react";
 import {useFrame,useThree,} from "@react-three/fiber";
 import * as THREE from "three";
 import {SCULPTURE_CENTER_Y,ARTWORK_CAMERA_RADIUS,ARTWORK_CENTER_Y,CAMERA_ARRIVAL_THRESHOLD,CAMERA_MOVE_SPEED,GALLERY_CAMERA_POSITION,SCULPTURE_CAMERA_POSITION,} from "../../constants/scene";
+import { calculateArtworkAngle } from "../../utils/calculateArtworkAngle";
 
 export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount, artworkRadius}) {
   const { camera } = useThree();
@@ -12,19 +13,15 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
   const galleryCameraPosition = useMemo(() => new THREE.Vector3(...GALLERY_CAMERA_POSITION),[]);
   const galleryTarget = useMemo(() => new THREE.Vector3(0, ARTWORK_CENTER_Y, 0),[]);
 
-  const artworkAngle = useMemo(() => {
-      if (selectedPhotoIndex < 0 || artworkCount === 0) {
-        return null;
-      }
-      return (
-        (selectedPhotoIndex / artworkCount) * Math.PI * 2
-      );
-    }, [selectedPhotoIndex, artworkCount]);
+  const artworkAngle = useMemo(
+    () => calculateArtworkAngle(selectedPhotoIndex, artworkCount),
+    [selectedPhotoIndex, artworkCount]
+  );
   const artworkTarget = useMemo(() => {
     if (artworkAngle === null) {
       return null;
     }
-    return new THREE.Vector3(Math.sin(artworkAngle) * artworkRadius,3,-Math.cos(artworkAngle) * artworkRadius);// ARTWORK_RADIUS
+    return new THREE.Vector3(Math.sin(artworkAngle) * artworkRadius,ARTWORK_CENTER_Y,-Math.cos(artworkAngle) * artworkRadius);
   }, [artworkAngle, artworkRadius]);
 
   const artworkCameraPosition = useMemo(() => {
