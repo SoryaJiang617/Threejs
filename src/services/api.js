@@ -1,8 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+const photosApiBaseUrl =process.env.REACT_APP_PHOTOS_API_BASE_URL;
+const imageBaseUrl =process.env.REACT_APP_IMAGE_BASE_URL;
 export const apiSlice = createApi({
   reducerPath: "galleryApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://jsonplaceholder.typicode.com/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: photosApiBaseUrl }),
   endpoints: (builder) => ({
     getPhotos: builder.query({
       // limit default 20
@@ -20,12 +22,15 @@ export const apiSlice = createApi({
           originalUrl: photo.url,
           originalThumbnailUrl: photo.thumbnailUrl,
 
-          url:`https://picsum.photos/seed/gallery-${photo.id}/600/400`,
-
-          thumbnailUrl:`https://picsum.photos/seed/gallery-${photo.id}/160/107`,
+          url: `${imageBaseUrl}/seed/gallery-${photo.id}/600/400`,
+          thumbnailUrl: `${imageBaseUrl}/seed/gallery-${photo.id}/160/107`,
         })),
     }),
   }),
 });
 
 export const { useGetPhotosQuery } = apiSlice;
+// 公司原始 Gallery.js
+// → 请求 JSONPlaceholder /photos
+// → JSONPlaceholder 返回 photo 数据
+// → 每条数据包含 url 和 thumbnailUrl

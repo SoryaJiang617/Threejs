@@ -1,15 +1,16 @@
 import {useEffect,useMemo,useRef,} from "react";
 import {useFrame,useThree,} from "@react-three/fiber";
 import * as THREE from "three";
+import {SCULPTURE_CENTER_Y,ARTWORK_CAMERA_RADIUS,ARTWORK_CENTER_Y,CAMERA_ARRIVAL_THRESHOLD,CAMERA_MOVE_SPEED,GALLERY_CAMERA_POSITION,SCULPTURE_CAMERA_POSITION,} from "../../constants/scene";
 
 export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount, artworkRadius}) {
   const { camera } = useThree();
   const hasArrived = useRef(false);
-  const sculptureCameraPosition =useMemo(() => new THREE.Vector3(4, 5, 4),[]);//4.75+any num=5
-  const sculptureTarget =useMemo(() => new THREE.Vector3(0, 4.75, 0),[]);//sculpture center =4 + 1.5 / 2= 4.75
+  const sculptureCameraPosition =useMemo(() => new THREE.Vector3(...SCULPTURE_CAMERA_POSITION),[]);//4.75+any num=5
+  const sculptureTarget =useMemo(() => new THREE.Vector3(0, SCULPTURE_CENTER_Y, 0),[]);//sculpture center =4 + 1.5 / 2= 4.75
 
-  const galleryCameraPosition = useMemo(() => new THREE.Vector3(0, 5, 8),[]);
-  const galleryTarget = useMemo(() => new THREE.Vector3(0, 3, 0),[]);
+  const galleryCameraPosition = useMemo(() => new THREE.Vector3(...GALLERY_CAMERA_POSITION),[]);
+  const galleryTarget = useMemo(() => new THREE.Vector3(0, ARTWORK_CENTER_Y, 0),[]);
 
   const artworkAngle = useMemo(() => {
       if (selectedPhotoIndex < 0 || artworkCount === 0) {
@@ -24,14 +25,14 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
       return null;
     }
     return new THREE.Vector3(Math.sin(artworkAngle) * artworkRadius,3,-Math.cos(artworkAngle) * artworkRadius);// ARTWORK_RADIUS
-  }, [artworkAngle]);
+  }, [artworkAngle, artworkRadius]);
 
   const artworkCameraPosition = useMemo(() => {
     if (artworkAngle === null) {
       return null;
     }
-    const cameraRadius = 7;
-    return new THREE.Vector3(Math.sin(artworkAngle) * cameraRadius,3,-Math.cos(artworkAngle) * cameraRadius);
+
+    return new THREE.Vector3(Math.sin(artworkAngle) * ARTWORK_CAMERA_RADIUS,ARTWORK_CENTER_Y,-Math.cos(artworkAngle) * ARTWORK_CAMERA_RADIUS);
   }, [artworkAngle]);
 
   useEffect(() => {
@@ -55,13 +56,12 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
       lookAtPosition = galleryTarget;
     } else return;
 
-    const moveSpeed = 2.5;
-    const lerpAmount = 1 - Math.exp(-moveSpeed * delta);
+    const lerpAmount = 1 - Math.exp(-CAMERA_MOVE_SPEED * delta);
 
     camera.position.lerp(cameraDestination,lerpAmount );
     camera.lookAt(lookAtPosition);
 
-    if (camera.position.distanceTo(cameraDestination) < 0.05) {
+    if (camera.position.distanceTo(cameraDestination) < CAMERA_ARRIVAL_THRESHOLD) {
       hasArrived.current = true;
       if (cameraMode === "sculpture") {
         onArrive();

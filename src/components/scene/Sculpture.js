@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import {SCULPTURE_BASE_Y,SCULPTURE_DISPLAY_HEIGHT,} from "../../constants/scene";
 
 export default function Sculpture() {
   const { scene } = useGLTF("/adjustable_leg.glb");
@@ -20,15 +21,14 @@ export default function Sculpture() {
     box.getSize(size);
     box.getCenter(center);
 
-    const targetHeight = 1.5;
-    const modelScale =size.y > 0 ? targetHeight / size.y : 1;
+    const modelScale =size.y > 0 ? SCULPTURE_DISPLAY_HEIGHT / size.y : 1;
     const modelOffset = [-center.x,-box.min.y,-center.z,];
 
     return {model,modelScale,modelOffset,};
   }, [scene]);
 
   return (
-    <group position={[0, 4, 0]} scale={modelScale}>
+    <group position={[0, SCULPTURE_BASE_Y, 0]} scale={modelScale}>
       <group position={modelOffset}>
         <primitive object={model} />
       </group>

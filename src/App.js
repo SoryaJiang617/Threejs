@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import RoomScene from "./RoomScene";
-import Gallery from "./Gallery";
+import RoomScene from "./components/RoomScene";
+import Gallery from "./components/Gallery";
 import { useGetPhotosQuery } from "./services/api";
 
 function App() {
@@ -53,6 +53,7 @@ function App() {
           photos={photos}
           cameraMode={cameraMode}
           selectedPhotoId={selectedPhotoId}
+          onSelect={handleSelect}
         />
       </div>
     </div>

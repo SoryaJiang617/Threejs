@@ -4,6 +4,26 @@ This is a simple test to verify your familiarity with Three.js and React, it sho
 
 This is a simple art gallery application with a 3D virtual art gallery scene.
 
+## Requirements
+
+- Node.js 22
+- npm 10
+
+This project was tested with Node.js 22.13.1 and npm 10.9.2.
+
+## Setup
+
+1. Run `npm install`.
+2. Copy `.env.sample` and rename the copy to `.env`.
+3. Check the API URLs in `.env`.
+4. Run `npm start`.
+5. Open [http://localhost:3000](http://localhost:3000).
+
+The environment variables are:
+
+- `REACT_APP_PHOTOS_API_BASE_URL` - base URL for the photo data API.
+- `REACT_APP_IMAGE_BASE_URL` - base URL for the displayed images.
+
 ## Tasks
 
 1. Rewrite image fetching to use RTK
@@ -20,7 +40,7 @@ This is a simple art gallery application with a 3D virtual art gallery scene.
 - I built the 3D scene with React Three Fiber and Drei.
 - The images keep their original aspect ratio and are displayed in frames around the wall.
 - The sculpture is loaded with `useGLTF`. I used `Box3` to calculate its size and place it on the cylinder.
-- Clicking an image moves the camera to the related frame.
+- An artwork can be selected from the list or directly from the 3D scene, and the camera moves to its related frame.
 - The sculpture button moves the camera to the sculpture and starts a slow orbit.
 - The camera can also move back to the main gallery view.
 - I added lighting, shadows, loading feedback, error handling, and hover and selected styles.
@@ -30,9 +50,11 @@ This is a simple art gallery application with a 3D virtual art gallery scene.
 
 The API still returns the photo data, but the original `via.placeholder.com` image URLs did not work during development. I kept the original URLs in `originalUrl` and `originalThumbnailUrl`, and used Picsum URLs to display the images.
 
+The photo ID is used as the Picsum seed, so each item keeps the same image. Separate full-size and thumbnail dimensions are used to balance image quality and loading size.
+
 ### Controls
 
-- Click an artwork in the list to view it in the 3D gallery.
+- Click an artwork in the list or in the 3D scene to select and view it.
 - Click **View Sculpture** to focus on the sculpture.
 - Click **Back to Gallery** to return to the main view.
 - Drag inside the 3D view to rotate the camera.
@@ -44,71 +66,26 @@ Once you're done:
 2. Create a zip file of the entire directory, including the .git file
 3. Send it back to us
 
-Thanks!
-
-## Application Environment
-
-This application was built using Create React App, so all the usual scripts are available:
+## Available Scripts
 
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Starts the app in development mode.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### `npm test -- --watchAll=false`
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Runs the unit tests once.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Creates an optimized production build.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Tests
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The unit tests cover the artwork angle calculation used to connect a selected list item with its position in the circular 3D gallery.
 
-### `npm run eject`
+## Possible Improvements
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Replace the demo photo service with a production image API or CDN.
+- Add integration tests for the camera transitions.
+- Add lazy loading if the gallery needs to display a much larger number of artworks.

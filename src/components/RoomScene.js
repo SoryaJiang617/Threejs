@@ -5,10 +5,8 @@ import * as THREE from "three";
 import Artwork from "./scene/Artwork";
 import Sculpture from "./scene/Sculpture";
 import CameraRig from "./scene/CameraRig";
-
-const ROOM_RADIUS = 10;
-const ARTWORK_WALL_OFFSET = 0.6;
-const ARTWORK_RADIUS = ROOM_RADIUS - ARTWORK_WALL_OFFSET;
+import {ARTWORK_CENTER_Y,ARTWORK_RADIUS,ROOM_CENTER_Y,ROOM_HEIGHT,ROOM_RADIUS,PEDESTAL_CENTER_Y,PEDESTAL_HEIGHT,PEDESTAL_RADIUS,SCULPTURE_CENTER_Y,GALLERY_CAMERA_POSITION,} from "../constants/scene";
+import { calculateArtworkAngle } from "../utils/calculateArtworkAngle";
 
 class SceneErrorBoundary extends Component {
   state = {hasError: false};
@@ -46,13 +44,13 @@ function SceneLoader() {
 function Room() {
   return (
     <group>
-      <mesh position={[0, 5, 0]} receiveShadow>
-        <cylinderGeometry args={[10, 10, 10, 64, 1, true]}/>{/* roomWallsGeometry = new THREE.CylinderGeometry(10,10,10,64,1,true); */}
+      <mesh position={[0, ROOM_CENTER_Y, 0]} receiveShadow>
+        <cylinderGeometry args={[ROOM_RADIUS,ROOM_RADIUS,ROOM_HEIGHT, 64, 1, true]}/>{/* roomWallsGeometry = new THREE.CylinderGeometry(10,10,10,64,1,true); */}
         <meshStandardMaterial color="#d6d3d1" roughness={0.9} side={THREE.BackSide}/>
       </mesh>
-
+      {/* ground */}
       <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[10, 64]} />
+        <circleGeometry args={[ROOM_RADIUS, 64]} />
         <meshStandardMaterial color="#5f3d2d" roughness={0.72} metalness={0}/>
       </mesh>
     </group>
@@ -60,8 +58,8 @@ function Room() {
 }
 function Pedestal() {
   return (
-    <mesh position={[0, 2, 0]} castShadow receiveShadow>
-      <cylinderGeometry args={[1, 1, 4, 32]}/>{/* THREE.CylinderGeometry(1, 1, 4, 32); */}
+    <mesh position={[0, PEDESTAL_CENTER_Y, 0]} castShadow receiveShadow>
+      <cylinderGeometry args={[PEDESTAL_RADIUS,PEDESTAL_RADIUS,PEDESTAL_HEIGHT, 32]}/>{/* THREE.CylinderGeometry(1, 1, 4, 32); */}
       <meshStandardMaterial color="#b8b0a4" roughness={0.45} metalness={0}/>
     </mesh>
   );
@@ -69,7 +67,7 @@ function Pedestal() {
 // function Sculpture() {
 // function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount,}) {
 
-const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
+const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
   const visiblePhotos = photos.slice(0, 20);
   const selectedPhotoIndex =
   visiblePhotos.findIndex((photo) => photo.id === selectedPhotoId);
@@ -98,7 +96,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
 
   return (
     <div className="h-full w-full">
-      <Canvas shadows camera={{ position: [0, 5, 8] }}>{/* y=5 房间高度 10 的中间附近;z=8在房间 radius 10 里面 */}
+      <Canvas shadows camera={{ position: GALLERY_CAMERA_POSITION, }}>{/* y=5 房间高度 10 的中间附近;z=8在房间 radius 10 里面 */}
         <color attach="background" args={["#171717"]} />
 
         <ambientLight intensity={0.5} />
@@ -116,7 +114,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
           <Suspense fallback={<SceneLoader />}>
             <Sculpture />
             {visiblePhotos.map((photo, index) => {
-              const angle = (index / visiblePhotos.length) * Math.PI * 2;
+              const angle = calculateArtworkAngle(index, visiblePhotos.length);
               const x = Math.sin(angle) * ARTWORK_RADIUS;
               const z = -Math.cos(angle) * ARTWORK_RADIUS;
 
@@ -124,9 +122,10 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
                 <Artwork
                   key={photo.id}
                   imageUrl={photo.url}
-                  position={[x, 3, z]}
+                  position={[x, ARTWORK_CENTER_Y, z]}
                   rotation={[0, -angle, 0]}
                   selected={photo.id === selectedPhotoId}
+                  onSelect={() => onSelect(photo)}
                 />
               );
             })}
@@ -143,7 +142,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,}) => {
           enabled={
             cameraMode === "gallery" || (cameraMode === "sculpture" && isOrbiting)
           }
-          target={cameraMode === "sculpture" ? [0, 4.75, 0] : [0, 3, 0]}// 4.75 = 算出来的 sculpture 中心;3 = 你现在画作的统一中心高度
+          target={cameraMode === "sculpture" ? [0, SCULPTURE_CENTER_Y, 0] : [0, ARTWORK_CENTER_Y, 0]}// 4.75 = 算出来的 sculpture 中心;3 = 你现在画作的统一中心高度
           autoRotate={cameraMode === "sculpture" && isOrbiting && !prefersReducedMotion}
           autoRotateSpeed={0.5}
           enableDamping
