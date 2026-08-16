@@ -9,6 +9,13 @@ This is a simple art gallery application with a 3D virtual art gallery scene.
 - Node.js 22
 - npm 10
 
+If you use nvm, you can install and select the tested Node.js version with:
+
+```bash
+nvm install 22.13.1
+nvm use 22.13.1
+```
+
 This project was tested with Node.js 22.13.1 and npm 10.9.2.
 
 ## Setup
@@ -79,6 +86,22 @@ Runs the unit tests once.
 ### `npm run build`
 
 Creates an optimized production build.
+
+### `npm run lint`
+
+Checks JavaScript files with ESLint.
+
+### `npm run lint:fix`
+
+Fixes ESLint problems that can be fixed automatically.
+
+### `npm run format`
+
+Formats JavaScript, JSX, and CSS files with Prettier.
+
+### `npm run format:check`
+
+Checks whether the source files follow the Prettier format.
 
 ## Tests
 

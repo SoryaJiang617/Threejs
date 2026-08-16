@@ -4,22 +4,20 @@ import Gallery from "./components/Gallery";
 import { useGetPhotosQuery } from "./services/api";
 
 function App() {
-  const {
-    data: photos = [],
-    isLoading,
-    isError,
-  } = useGetPhotosQuery(20);
+  const { data: photos = [], isLoading, isError } = useGetPhotosQuery(20);
 
-  const [selectedPhotoId, setSelectedPhotoId] =useState(null);
-  const [cameraMode, setCameraMode] =useState("gallery");
-  
+  const [selectedPhotoId, setSelectedPhotoId] = useState(null);
+  const [cameraMode, setCameraMode] = useState("gallery");
+
   const handleSelect = (photo) => {
     setSelectedPhotoId(photo.id);
     setCameraMode("artwork");
   };
   const handleViewSculpture = () => {
-    setCameraMode((currentMode) => currentMode === "sculpture" ? "gallery" : "sculpture");
-};
+    setCameraMode((currentMode) =>
+      currentMode === "sculpture" ? "gallery" : "sculpture",
+    );
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-950 text-neutral-100">
@@ -44,9 +42,7 @@ function App() {
             shadow-md hover:bg-neutral-200
           "
         >
-          {cameraMode === "sculpture"
-            ? "Back to Gallery"
-            : "View Sculpture"}
+          {cameraMode === "sculpture" ? "Back to Gallery" : "View Sculpture"}
         </button>
 
         <RoomScene

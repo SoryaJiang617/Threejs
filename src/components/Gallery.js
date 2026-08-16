@@ -8,12 +8,18 @@ const Gallery = ({
   onSelect,
 }) => {
   if (isLoading) {
-    return <p className="flex h-full items-center justify-center text-sm text-neutral-400">Loading artworks...</p>;
+    return (
+      <p className="flex h-full items-center justify-center text-sm text-neutral-400">
+        Loading artworks...
+      </p>
+    );
   }
 
   if (isError) {
     return (
-      <p className="flex h-full items-center justify-center px-4 text-center text-sm text-red-400">Unable to load artworks.</p>
+      <p className="flex h-full items-center justify-center px-4 text-center text-sm text-red-400">
+        Unable to load artworks.
+      </p>
     );
   }
 
@@ -25,8 +31,7 @@ const Gallery = ({
 
       <ul className="space-y-2">
         {photos.map((photo) => {
-          const selected =
-            photo.id === selectedPhotoId;
+          const selected = photo.id === selectedPhotoId;
 
           return (
             <li key={photo.id}>

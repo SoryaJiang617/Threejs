@@ -1,27 +1,57 @@
-import {useEffect,useMemo,useRef,} from "react";
-import {useFrame,useThree,} from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import {SCULPTURE_CENTER_Y,ARTWORK_CAMERA_RADIUS,ARTWORK_CENTER_Y,CAMERA_ARRIVAL_THRESHOLD,CAMERA_MOVE_SPEED,GALLERY_CAMERA_POSITION,SCULPTURE_CAMERA_POSITION,} from "../../constants/scene";
+import {
+  SCULPTURE_CENTER_Y,
+  ARTWORK_CAMERA_RADIUS,
+  ARTWORK_CENTER_Y,
+  CAMERA_ARRIVAL_THRESHOLD,
+  CAMERA_MOVE_SPEED,
+  GALLERY_CAMERA_POSITION,
+  SCULPTURE_CAMERA_POSITION,
+} from "../../constants/scene";
 import { calculateArtworkAngle } from "../../utils/calculateArtworkAngle";
 
-export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, artworkCount, artworkRadius}) {
+export default function CameraRig({
+  cameraMode,
+  onArrive,
+  selectedPhotoIndex,
+  artworkCount,
+  artworkRadius,
+}) {
   const { camera } = useThree();
   const hasArrived = useRef(false);
-  const sculptureCameraPosition =useMemo(() => new THREE.Vector3(...SCULPTURE_CAMERA_POSITION),[]);//4.75+any num=5
-  const sculptureTarget =useMemo(() => new THREE.Vector3(0, SCULPTURE_CENTER_Y, 0),[]);//sculpture center =4 + 1.5 / 2= 4.75
+  const sculptureCameraPosition = useMemo(
+    () => new THREE.Vector3(...SCULPTURE_CAMERA_POSITION),
+    [],
+  ); //4.75+any num=5
+  const sculptureTarget = useMemo(
+    () => new THREE.Vector3(0, SCULPTURE_CENTER_Y, 0),
+    [],
+  ); //sculpture center =4 + 1.5 / 2= 4.75
 
-  const galleryCameraPosition = useMemo(() => new THREE.Vector3(...GALLERY_CAMERA_POSITION),[]);
-  const galleryTarget = useMemo(() => new THREE.Vector3(0, ARTWORK_CENTER_Y, 0),[]);
+  const galleryCameraPosition = useMemo(
+    () => new THREE.Vector3(...GALLERY_CAMERA_POSITION),
+    [],
+  );
+  const galleryTarget = useMemo(
+    () => new THREE.Vector3(0, ARTWORK_CENTER_Y, 0),
+    [],
+  );
 
   const artworkAngle = useMemo(
     () => calculateArtworkAngle(selectedPhotoIndex, artworkCount),
-    [selectedPhotoIndex, artworkCount]
+    [selectedPhotoIndex, artworkCount],
   );
   const artworkTarget = useMemo(() => {
     if (artworkAngle === null) {
       return null;
     }
-    return new THREE.Vector3(Math.sin(artworkAngle) * artworkRadius,ARTWORK_CENTER_Y,-Math.cos(artworkAngle) * artworkRadius);
+    return new THREE.Vector3(
+      Math.sin(artworkAngle) * artworkRadius,
+      ARTWORK_CENTER_Y,
+      -Math.cos(artworkAngle) * artworkRadius,
+    );
   }, [artworkAngle, artworkRadius]);
 
   const artworkCameraPosition = useMemo(() => {
@@ -29,7 +59,11 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
       return null;
     }
 
-    return new THREE.Vector3(Math.sin(artworkAngle) * ARTWORK_CAMERA_RADIUS,ARTWORK_CENTER_Y,-Math.cos(artworkAngle) * ARTWORK_CAMERA_RADIUS);
+    return new THREE.Vector3(
+      Math.sin(artworkAngle) * ARTWORK_CAMERA_RADIUS,
+      ARTWORK_CENTER_Y,
+      -Math.cos(artworkAngle) * ARTWORK_CAMERA_RADIUS,
+    );
   }, [artworkAngle]);
 
   useEffect(() => {
@@ -44,7 +78,10 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
     if (cameraMode === "sculpture") {
       cameraDestination = sculptureCameraPosition;
       lookAtPosition = sculptureTarget;
-    } else if (cameraMode === "artwork" && artworkCameraPosition !== null && artworkTarget !== null
+    } else if (
+      cameraMode === "artwork" &&
+      artworkCameraPosition !== null &&
+      artworkTarget !== null
     ) {
       cameraDestination = artworkCameraPosition;
       lookAtPosition = artworkTarget;
@@ -55,10 +92,12 @@ export default function CameraRig({ cameraMode, onArrive, selectedPhotoIndex, ar
 
     const lerpAmount = 1 - Math.exp(-CAMERA_MOVE_SPEED * delta);
 
-    camera.position.lerp(cameraDestination,lerpAmount );
+    camera.position.lerp(cameraDestination, lerpAmount);
     camera.lookAt(lookAtPosition);
 
-    if (camera.position.distanceTo(cameraDestination) < CAMERA_ARRIVAL_THRESHOLD) {
+    if (
+      camera.position.distanceTo(cameraDestination) < CAMERA_ARRIVAL_THRESHOLD
+    ) {
       hasArrived.current = true;
       if (cameraMode === "sculpture") {
         onArrive();

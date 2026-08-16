@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const photosApiBaseUrl =process.env.REACT_APP_PHOTOS_API_BASE_URL;
-const imageBaseUrl =process.env.REACT_APP_IMAGE_BASE_URL;
+const photosApiBaseUrl = process.env.REACT_APP_PHOTOS_API_BASE_URL;
+const imageBaseUrl = process.env.REACT_APP_IMAGE_BASE_URL;
 export const apiSlice = createApi({
   reducerPath: "galleryApi",
   baseQuery: fetchBaseQuery({ baseUrl: photosApiBaseUrl }),
@@ -12,7 +12,7 @@ export const apiSlice = createApi({
         url: "photos",
         params: {
           _limit: limit,
-         },
+        },
       }),
 
       transformResponse: (photos) =>

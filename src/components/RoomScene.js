@@ -1,18 +1,29 @@
-import { Suspense,useState,useEffect, Component,} from "react";
+import { Suspense, useState, useEffect, Component } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Html, useProgress,} from "@react-three/drei";
+import { OrbitControls, Html, useProgress } from "@react-three/drei";
 import * as THREE from "three";
 import Artwork from "./scene/Artwork";
 import Sculpture from "./scene/Sculpture";
 import CameraRig from "./scene/CameraRig";
-import {ARTWORK_CENTER_Y,ARTWORK_RADIUS,ROOM_CENTER_Y,ROOM_HEIGHT,ROOM_RADIUS,PEDESTAL_CENTER_Y,PEDESTAL_HEIGHT,PEDESTAL_RADIUS,SCULPTURE_CENTER_Y,GALLERY_CAMERA_POSITION,} from "../constants/scene";
+import {
+  ARTWORK_CENTER_Y,
+  ARTWORK_RADIUS,
+  ROOM_CENTER_Y,
+  ROOM_HEIGHT,
+  ROOM_RADIUS,
+  PEDESTAL_CENTER_Y,
+  PEDESTAL_HEIGHT,
+  PEDESTAL_RADIUS,
+  SCULPTURE_CENTER_Y,
+  GALLERY_CAMERA_POSITION,
+} from "../constants/scene";
 import { calculateArtworkAngle } from "../utils/calculateArtworkAngle";
 
 class SceneErrorBoundary extends Component {
-  state = {hasError: false};
+  state = { hasError: false };
 
   static getDerivedStateFromError() {
-    return {hasError: true};
+    return { hasError: true };
   }
   render() {
     if (this.state.hasError) {
@@ -44,13 +55,20 @@ function Room() {
   return (
     <group>
       <mesh position={[0, ROOM_CENTER_Y, 0]} receiveShadow>
-        <cylinderGeometry args={[ROOM_RADIUS,ROOM_RADIUS,ROOM_HEIGHT, 64, 1, true]}/>{/* roomWallsGeometry = new THREE.CylinderGeometry(10,10,10,64,1,true); */}
-        <meshStandardMaterial color="#d6d3d1" roughness={0.9} side={THREE.BackSide}/>
+        <cylinderGeometry
+          args={[ROOM_RADIUS, ROOM_RADIUS, ROOM_HEIGHT, 64, 1, true]}
+        />
+        {/* roomWallsGeometry = new THREE.CylinderGeometry(10,10,10,64,1,true); */}
+        <meshStandardMaterial
+          color="#d6d3d1"
+          roughness={0.9}
+          side={THREE.BackSide}
+        />
       </mesh>
       {/* ground */}
       <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[ROOM_RADIUS, 64]} />
-        <meshStandardMaterial color="#5f3d2d" roughness={0.72} metalness={0}/>
+        <meshStandardMaterial color="#5f3d2d" roughness={0.72} metalness={0} />
       </mesh>
     </group>
   );
@@ -58,17 +76,21 @@ function Room() {
 function Pedestal() {
   return (
     <mesh position={[0, PEDESTAL_CENTER_Y, 0]} castShadow receiveShadow>
-      <cylinderGeometry args={[PEDESTAL_RADIUS,PEDESTAL_RADIUS,PEDESTAL_HEIGHT, 32]}/>{/* THREE.CylinderGeometry(1, 1, 4, 32); */}
-      <meshStandardMaterial color="#b8b0a4" roughness={0.45} metalness={0}/>
+      <cylinderGeometry
+        args={[PEDESTAL_RADIUS, PEDESTAL_RADIUS, PEDESTAL_HEIGHT, 32]}
+      />
+      {/* THREE.CylinderGeometry(1, 1, 4, 32); */}
+      <meshStandardMaterial color="#b8b0a4" roughness={0.45} metalness={0} />
     </mesh>
   );
 }
 
-const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
+const RoomScene = ({ photos = [], cameraMode, selectedPhotoId, onSelect }) => {
   const visiblePhotos = photos.slice(0, 20);
-  const selectedPhotoIndex =
-  visiblePhotos.findIndex((photo) => photo.id === selectedPhotoId);
-  const [isOrbiting, setIsOrbiting] =useState(false);
+  const selectedPhotoIndex = visiblePhotos.findIndex(
+    (photo) => photo.id === selectedPhotoId,
+  );
+  const [isOrbiting, setIsOrbiting] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -93,7 +115,7 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
 
   return (
     <div className="h-full w-full">
-      <Canvas shadows camera={{ position: GALLERY_CAMERA_POSITION, }}>
+      <Canvas shadows camera={{ position: GALLERY_CAMERA_POSITION }}>
         <color attach="background" args={["#171717"]} />
 
         <ambientLight intensity={0.5} />
@@ -128,19 +150,27 @@ const RoomScene = ({ photos = [],cameraMode, selectedPhotoId,onSelect,}) => {
             })}
           </Suspense>
         </SceneErrorBoundary>
-        
-        <CameraRig 
-          cameraMode={cameraMode} 
+
+        <CameraRig
+          cameraMode={cameraMode}
           onArrive={() => setIsOrbiting(true)}
           selectedPhotoIndex={selectedPhotoIndex}
           artworkCount={visiblePhotos.length}
-          artworkRadius={ARTWORK_RADIUS}/>
+          artworkRadius={ARTWORK_RADIUS}
+        />
         <OrbitControls
           enabled={
-            cameraMode === "gallery" || (cameraMode === "sculpture" && isOrbiting)
+            cameraMode === "gallery" ||
+            (cameraMode === "sculpture" && isOrbiting)
           }
-          target={cameraMode === "sculpture" ? [0, SCULPTURE_CENTER_Y, 0] : [0, ARTWORK_CENTER_Y, 0]}
-          autoRotate={cameraMode === "sculpture" && isOrbiting && !prefersReducedMotion}
+          target={
+            cameraMode === "sculpture"
+              ? [0, SCULPTURE_CENTER_Y, 0]
+              : [0, ARTWORK_CENTER_Y, 0]
+          }
+          autoRotate={
+            cameraMode === "sculpture" && isOrbiting && !prefersReducedMotion
+          }
           autoRotateSpeed={0.5}
           enableDamping
           dampingFactor={0.08}
